@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Test_Taste_Console_Application.Domain.DataTransferObjects;
@@ -13,6 +13,21 @@ namespace Test_Taste_Console_Application.Domain.Objects
         public float AverageMoonGravity
         {
             get => 0.0f;
+        }
+
+        public float AverageMoonTemperature
+        {
+            get
+            {
+                if (Moons == null || Moons.Count == 0) return 0.0f;
+                
+                float totalTemp = 0.0f;
+                foreach (var moon in Moons)
+                {
+                    totalTemp += moon.AverageTemperature;
+                }
+                return totalTemp / Moons.Count;
+            }
         }
 
         public Planet(PlanetDto planetDto)

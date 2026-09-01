@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Test_Taste_Console_Application.Constants;
 using Test_Taste_Console_Application.Domain.Objects;
@@ -178,12 +178,48 @@ namespace Test_Taste_Console_Application.Domain.Services
             ConsoleWriter.CreateEmptyLines(2);
             
             /*
+                }
+            }
+
+            ConsoleWriter.CreateLine(columnSizes);
+            ConsoleWriter.CreateEmptyLines(2);
+            
+            /*
                 --------------------+--------------------------------------------------
                 Planet's Number     |Planet's Average Moon Gravity
                 --------------------+--------------------------------------------------
                 1                   |0.0f
                 --------------------+--------------------------------------------------
             */
+        }
+
+        public void OutputAllPlanetsAndTheirAverageMoonTemperatureToConsole()
+        {
+            var planets = _planetService.GetAllPlanets().ToArray();
+            if (!planets.Any())
+            {
+                Console.WriteLine(OutputString.NoPlanetsFound);
+                return;
+            }
+
+            var columnSizes = new[] { 20, 30 };
+            var columnLabels = new[]
+            {
+                OutputString.PlanetId, "Average Moon Temperature"
+            };
+
+            ConsoleWriter.CreateHeader(columnLabels, columnSizes);
+
+            foreach(Planet planet in planets)
+            {
+                if(planet.HasMoons())
+                {
+                    ConsoleWriter.CreateText(new string[] { $"{planet.Id}", $"{planet.AverageMoonTemperature}" }, columnSizes);
+                }
+            }
+
+            ConsoleWriter.CreateLine(columnSizes);
+            ConsoleWriter.CreateEmptyLines(2);
         }
     }
 }
