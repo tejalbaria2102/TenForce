@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text;
@@ -9,6 +9,8 @@ using Test_Taste_Console_Application.Domain.DataTransferObjects.JsonObjects;
 using Test_Taste_Console_Application.Domain.Objects;
 using Test_Taste_Console_Application.Domain.Services.Interfaces;
 using Test_Taste_Console_Application.Utilities;
+using Test_Taste_Console_Application.Domain.Services.Interfaces;
+using Test_Taste_Console_Application.Utilities;
 
 namespace Test_Taste_Console_Application.Domain.Services
 {
@@ -16,6 +18,7 @@ namespace Test_Taste_Console_Application.Domain.Services
     public class PlanetService : IPlanetService
     {
         private readonly HttpClientService _httpClientService;
+        private IEnumerable<Planet> _cachedPlanets;
 
         public PlanetService(HttpClientService httpClientService)
         {
@@ -24,6 +27,11 @@ namespace Test_Taste_Console_Application.Domain.Services
 
         public IEnumerable<Planet> GetAllPlanets()
         {
+            if (_cachedPlanets != null)
+            {
+                return _cachedPlanets;
+            }
+
             var allPlanetsWithTheirMoons = new Collection<Planet>();
 
             var response = _httpClientService.Client
@@ -56,6 +64,13 @@ namespace Test_Taste_Console_Application.Domain.Services
                         var moonResponse = _httpClientService.Client
                             .GetAsync(UriPath.GetMoonByIdQueryParameters + moon.URLId)
                             .Result;
+                        
+                        if (!moonResponse.IsSuccessStatusCode)
+                        {
+                            Logger.Instance.Warn($"Failed to fetch moon {moon.URLId}: {moonResponse.StatusCode}");
+                            continue;
+                        }
+                        
                         var moonContent = moonResponse.Content.ReadAsStringAsync().Result;
                         newMoonsCollection.Add(JsonConvert.DeserializeObject<MoonDto>(moonContent));
                     }
@@ -65,7 +80,8 @@ namespace Test_Taste_Console_Application.Domain.Services
                 allPlanetsWithTheirMoons.Add(new Planet(planet));
             }
 
-            return allPlanetsWithTheirMoons;
+            _cachedPlanets = allPlanetsWithTheirMoons;
+            return _cachedPlanets;
         }
 
         private static string RemoveDiacritics(string text)

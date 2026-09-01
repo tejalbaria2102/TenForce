@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 using log4net;
@@ -27,21 +27,20 @@ namespace Test_Taste_Console_Application
         {
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            //The service provider gets the services.
-            var screenOutputService = serviceProvider.GetService<IOutputService>();
-
             try
             {
+                var screenOutputService = serviceProvider.GetService<IOutputService>();
                 screenOutputService.OutputAllPlanetsAndTheirAverageMoonGravityToConsole();
                 screenOutputService.OutputAllMoonsAndTheirMassToConsole();
                 screenOutputService.OutputAllPlanetsAndTheirMoonsToConsole();
+                screenOutputService.OutputAllPlanetsAndTheirAverageMoonTemperatureToConsole();
             }
             catch (Exception exception)
             {
                 //The users and developers can see the thrown exceptions.
-                Logger.Instance.Error($"{LoggerMessage.ScreenOutputOperationFailed}{exception.Message}");
-                Console.WriteLine($"{ExceptionMessage.ScreenOutputOperationFailed}{exception.Message}");
-                System.Diagnostics.Debug.WriteLine($""{ExceptionMessage.ScreenOutputOperationFailed}{exception.Message}"");
+                Logger.Instance.Error($"{LoggerMessage.ScreenOutputOperationFailed}{exception.ToString()}");
+                Console.WriteLine($"{ExceptionMessage.ScreenOutputOperationFailed}{exception.ToString()}");
+                System.Diagnostics.Debug.WriteLine($"{ExceptionMessage.ScreenOutputOperationFailed}{exception.ToString()}");
             }
 
             serviceProvider.Dispose();
